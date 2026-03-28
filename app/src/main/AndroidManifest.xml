@@ -11,7 +11,7 @@
 
     <application
         android:allowBackup="true"
-        android:appCategory="game"
+        android:appCategory="productivity"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
@@ -79,6 +79,7 @@
             android:launchMode="singleTop"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <meta-data android:name="distractionOptimized" android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -91,12 +92,16 @@
             android:name=".settings.SettingsActivity"
             android:exported="false"
             android:label="@string/settings_title"
-            android:theme="@style/Theme.AABrowser" />
+            android:theme="@style/Theme.AABrowser">
+            <meta-data android:name="distractionOptimized" android:value="true" />
+        </activity>
 
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
             android:exported="false"
-            android:theme="@style/Theme.AABrowser" />
+            android:theme="@style/Theme.AABrowser">
+            <meta-data android:name="distractionOptimized" android:value="true" />
+        </activity>
 
     </application>
 

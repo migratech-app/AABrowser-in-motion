@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -331,6 +332,59 @@ object SettingsViews {
         )
         siteDataCard.addView(siteDataInner)
         container.addView(siteDataCard)
+
+        // --- Experimental ---
+        val experimentalCard = createStyledCard()
+        val experimentalInner = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        experimentalInner.addView(createSectionTitle(context.getString(R.string.settings_experimental_title), R.drawable.settings_24px, bottomPaddingDp = 4))
+        experimentalInner.addView(TextView(context).apply {
+            text = context.getString(R.string.settings_experimental_description)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+            setTextColor(onSurfaceColor)
+            setPadding(0, dp(4), 0, dp(8))
+        })
+
+        val bypassSwitch = SwitchMaterial(context).apply {
+            text = context.getString(R.string.settings_motion_bypass)
+            isChecked = BrowserPreferences.isBypassMotionRestrictionsEnabled(context)
+            setTextColor(onSurfaceColor)
+            setOnCheckedChangeListener { _, isChecked ->
+                BrowserPreferences.setBypassMotionRestrictions(context, isChecked)
+            }
+        }
+        experimentalInner.addView(bypassSwitch)
+
+        experimentalInner.addView(TextView(context).apply {
+            text = context.getString(R.string.settings_motion_bypass_subtitle)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall)
+            setTextColor(onSurfaceColor)
+            alpha = 0.7f
+            setPadding(dp(32), 0, 0, dp(8))
+        })
+
+        val statusRow = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, dp(8), 0, 0)
+        }
+        statusRow.addView(TextView(context).apply {
+            text = context.getString(R.string.settings_motion_status_label)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+            setTextColor(onSurfaceColor)
+            setPadding(0, 0, dp(8), 0)
+        })
+        statusRow.addView(TextView(context).apply {
+            text = context.getString(R.string.settings_motion_status_optimized)
+            setTextColor(Color.parseColor("#4CAF50")) // Material Green
+            typeface = Typeface.DEFAULT_BOLD
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+        })
+        experimentalInner.addView(statusRow)
+
+        experimentalCard.addView(experimentalInner)
+        container.addView(experimentalCard)
 
 
         // --- License ---
