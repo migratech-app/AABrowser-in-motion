@@ -101,6 +101,16 @@
     <string name="sponsors_title">Sponsors</string>
     <string name="sponsors_none_text">This project currently has no sponsors. Donations are welcome — thank you for your support!</string>
     
+    <string name="settings_experimental_title">Experimental / Testing</string>
+    <string name="settings_experimental_description">Options for advanced testing and debugging of motion behavior.</string>
+    <string name="settings_motion_bypass">Bypass motion restrictions (Experimental)</string>
+    <string name="settings_motion_bypass_subtitle">Attempt to remain active while vehicle is in motion. Note: System-level blocks may still apply.</string>
+    <string name="settings_motion_status_label">Motion Status Capability:</string>
+    <string name="settings_motion_status_optimized">Distraction Optimized</string>
+    <string name="settings_motion_status_bypassed">Active (Bypassed)</string>
+    <string name="settings_motion_status_restricted">Restricted (Motion)</string>
+    <string name="settings_motion_status_idle">Active (Idle)</string>
+
     <string name="kododake_name">kododake (Lead)</string>
     
     <string name="error_generic_message">An unexpected error occurred.</string>

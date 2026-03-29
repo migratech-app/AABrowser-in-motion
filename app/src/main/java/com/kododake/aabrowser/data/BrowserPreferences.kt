@@ -14,6 +14,7 @@ object BrowserPreferences {
     private const val KEY_BOOKMARKS = "bookmarks"
     private const val KEY_ALLOWED_CLEAR_HOSTS = "allowed_clear_hosts"
     private const val KEY_ALLOWED_MICROPHONE_HOSTS = "allowed_microphone_hosts"
+    private const val KEY_BYPASS_MOTION_RESTRICTIONS = "bypass_motion_restrictions"
     private const val DEFAULT_URL = "https://www.google.com"
     private const val SEARCH_TEMPLATE = "https://www.google.com/search?q=%s"
 
@@ -144,6 +145,18 @@ object BrowserPreferences {
 
     fun addAllowedMicrophoneHost(context: Context, host: String) {
         addAllowedHost(context, KEY_ALLOWED_MICROPHONE_HOSTS, host)
+    }
+
+    fun isBypassMotionRestrictionsEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_BYPASS_MOTION_RESTRICTIONS, false)
+    }
+
+    fun setBypassMotionRestrictions(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_BYPASS_MOTION_RESTRICTIONS, enabled)
+            .apply()
     }
 
     fun clearSavedSitePermissions(context: Context) {
