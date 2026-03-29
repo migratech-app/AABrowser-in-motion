@@ -107,6 +107,9 @@
     <string name="settings_motion_bypass_subtitle">Attempt to remain active while vehicle is in motion. Note: System-level blocks may still apply.</string>
     <string name="settings_motion_status_label">Motion Status Capability:</string>
     <string name="settings_motion_status_optimized">Distraction Optimized</string>
+    <string name="settings_motion_status_bypassed">Active (Bypassed)</string>
+    <string name="settings_motion_status_restricted">Restricted (Motion)</string>
+    <string name="settings_motion_status_idle">Active (Idle)</string>
 
     <string name="kododake_name">kododake (Lead)</string>
     

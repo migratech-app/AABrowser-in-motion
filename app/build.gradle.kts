@@ -23,6 +23,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    useLibrary("android.car")
+
     signingConfigs {
         create("release") {
             val localProps = Properties().apply {

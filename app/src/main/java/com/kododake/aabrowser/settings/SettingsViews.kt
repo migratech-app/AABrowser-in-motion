@@ -23,6 +23,10 @@ import android.widget.Toast
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import android.car.Car
+import android.car.drivingstate.CarUxRestrictions
+import android.car.drivingstate.CarUxRestrictionsManager
+import android.content.pm.PackageManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kododake.aabrowser.R
 import com.kododake.aabrowser.data.BrowserPreferences
@@ -351,9 +355,6 @@ object SettingsViews {
             text = context.getString(R.string.settings_motion_bypass)
             isChecked = BrowserPreferences.isBypassMotionRestrictionsEnabled(context)
             setTextColor(onSurfaceColor)
-            setOnCheckedChangeListener { _, isChecked ->
-                BrowserPreferences.setBypassMotionRestrictions(context, isChecked)
-            }
         }
         experimentalInner.addView(bypassSwitch)
 
@@ -375,13 +376,58 @@ object SettingsViews {
             setTextColor(onSurfaceColor)
             setPadding(0, 0, dp(8), 0)
         })
-        statusRow.addView(TextView(context).apply {
+        val statusValue = TextView(context).apply {
             text = context.getString(R.string.settings_motion_status_optimized)
             setTextColor(Color.parseColor("#4CAF50")) // Material Green
             typeface = Typeface.DEFAULT_BOLD
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
-        })
+        }
+        statusRow.addView(statusValue)
         experimentalInner.addView(statusRow)
+
+        fun updateStatus() {
+            val isBypassed = BrowserPreferences.isBypassMotionRestrictionsEnabled(context)
+            if (isBypassed) {
+                statusValue.text = context.getString(R.string.settings_motion_status_bypassed)
+                statusValue.setTextColor(Color.parseColor("#4CAF50"))
+                return
+            }
+
+            if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+                statusValue.text = context.getString(R.string.settings_motion_status_optimized)
+                statusValue.setTextColor(Color.parseColor("#4CAF50"))
+                return
+            }
+
+            try {
+                val car = Car.createCar(context)
+                val manager = car.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE) as? CarUxRestrictionsManager
+                val restrictions = manager?.getCurrentCarUxRestrictions()
+                val isRestricted = (restrictions?.activeRestrictions != 0)
+
+                if (isRestricted == true) {
+                    statusValue.text = context.getString(R.string.settings_motion_status_restricted)
+                    statusValue.setTextColor(Color.parseColor("#F44336")) // Material Red
+                } else {
+                    statusValue.text = context.getString(R.string.settings_motion_status_idle)
+                    statusValue.setTextColor(Color.parseColor("#4CAF50"))
+                }
+                car.disconnect()
+            } catch (_: Exception) {
+                statusValue.text = context.getString(R.string.settings_motion_status_optimized)
+                statusValue.setTextColor(Color.parseColor("#4CAF50"))
+            } catch (_: NoClassDefFoundError) {
+                statusValue.text = context.getString(R.string.settings_motion_status_optimized)
+                statusValue.setTextColor(Color.parseColor("#4CAF50"))
+            }
+        }
+
+        bypassSwitch.setOnCheckedChangeListener { _, isChecked ->
+            BrowserPreferences.setBypassMotionRestrictions(context, isChecked)
+            updateStatus()
+        }
+
+        updateStatus()
 
         experimentalCard.addView(experimentalInner)
         container.addView(experimentalCard)

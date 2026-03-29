@@ -12,14 +12,24 @@ The application has been optimized to bypass typical "greyed out" or "blocked" s
 - **Hardware Acceleration**: Enabled for smooth rendering of web content.
 
 ### 2. Automotive Features (`automotive_app_desc.xml`)
-- Added `<uses name="template" />` in addition to `<uses name="media" />` to signal more flexible capability to the system.
+- Uses the `media` capability. Note: The app renders web content directly via WebView/Surface and does not use the templated `androidx.car.app` library, so the `template` capability is not required.
 
 ## Available Testing Options
 
 A new **Experimental / Testing** section has been added to the application's internal Settings menu.
 
-- **Bypass motion restrictions (Experimental)**: A persistent toggle to signal the app to remain active even if it detects motion. Note: System-level blocks (from Android Auto or the car manufacturer) may still apply if they don't honor the `distractionOptimized` flag.
-- **Motion Status Capability**: Shows the current "Distraction Optimized" status in the settings UI.
+- **Bypass motion restrictions (Experimental)**: A persistent toggle to signal the app to remain active and functional even if it detects motion. This works at the application level by bypassing the `CarUxRestrictionsManager` listener.
+    - *Note: This toggle only bypasses application-level logic (like disabling the address bar). System-level blocks from Android Auto or the car manufacturer may still apply.*
+- **Motion Status Capability**: A dynamic indicator that queries the `CarUxRestrictionsManager` at runtime to show whether the application is currently "Active", "Bypassed", or "Restricted" by the system's driving state.
+
+## Runtime Behavior & Safety
+
+When the vehicle is in motion and UX Restrictions are active (and the "Bypass" toggle is **OFF**):
+1. **Address Bar**: The address/URL bar is disabled to prevent typing while driving.
+2. **Menu Overlays**: Any open menu overlays are automatically hidden to minimize distraction.
+3. **Motion Status**: The status in Settings will turn red and show "Restricted (Motion)".
+
+When the "Bypass" toggle is **ON**, these restrictions are ignored by the app, and the Motion Status will show "Active (Bypassed)".
 
 ## Troubleshooting "Greyed Out" Icon in Android Auto
 

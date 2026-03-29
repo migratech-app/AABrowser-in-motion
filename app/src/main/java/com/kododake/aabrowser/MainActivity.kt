@@ -55,6 +55,9 @@ import com.google.zxing.common.BitMatrix
 import android.widget.RadioGroup
 import com.kododake.aabrowser.settings.SettingsViews
 import org.woheller69.freeDroidWarn.R as FreeDroidWarnR
+import android.car.Car
+import android.car.drivingstate.CarUxRestrictions
+import android.car.drivingstate.CarUxRestrictionsManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -86,6 +89,8 @@ class MainActivity : AppCompatActivity() {
     private val umamiTracker: UmamiTracker by lazy { UmamiTracker(applicationContext) }
     private var pendingPermissionRequest: android.webkit.PermissionRequest? = null
     private var speechBridge: com.kododake.aabrowser.web.SpeechRecognitionBridge? = null
+    private var carInstance: Any? = null
+    private var uxRestrictionsManagerInstance: Any? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         setupBackPressHandling()
         ensureNotificationPermissionIfNeeded()
         showFreeDroidWarnOnUpgradeMaterial()
+        setupCarRestrictions()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -136,7 +142,42 @@ class MainActivity : AppCompatActivity() {
         speechBridge = null
         binding.webView.releaseCompletely()
         webView = null
+        runCatching { (carInstance as? Car)?.disconnect() }
         super.onDestroy()
+    }
+
+    private fun setupCarRestrictions() {
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return
+        try {
+            val car = Car.createCar(this)
+            carInstance = car
+            val manager = car.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE) as? CarUxRestrictionsManager
+            uxRestrictionsManagerInstance = manager
+            manager?.registerListener { restrictions ->
+                runOnUiThread { handleUxRestrictions(restrictions) }
+            }
+            manager?.getCurrentCarUxRestrictions()?.let { handleUxRestrictions(it) }
+        } catch (_: Exception) {}
+    }
+
+    private fun handleUxRestrictions(restrictions: CarUxRestrictions) {
+        if (isFinishing || isDestroyed) return
+        if (BrowserPreferences.isBypassMotionRestrictionsEnabled(this)) {
+            binding.addressEdit.isEnabled = true
+            binding.addressEdit.hint = getString(R.string.menu_address_label)
+            return
+        }
+
+        val isRestricted = restrictions.activeRestrictions != 0
+
+        if (isRestricted) {
+            binding.addressEdit.isEnabled = false
+            binding.addressEdit.hint = "Disabled while driving"
+            if (binding.menuOverlay.isVisible) hideMenuOverlay()
+        } else {
+            binding.addressEdit.isEnabled = true
+            binding.addressEdit.hint = getString(R.string.menu_address_label)
+        }
     }
 
     private fun resolveThemeColor(attrRes: Int): Int {
