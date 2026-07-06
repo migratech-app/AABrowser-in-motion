@@ -1,0 +1,31 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # Esto permite activar la compilación manualmente con un botón
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17' # La mayoría de proyectos actuales usan Java 17 o 11
+
+      - name: Dar permisos al ejecutable de Gradle
+        run: chmod +x ./gradlew
+
+      - name: Compilar APK de depuración (Debug)
+        run: ./gradlew assembleDebug
+
+      - name: Subir el APK resultante
+        uses: actions/upload-artifact@v4
+        with:
+          name: mi-aplicacion-apk
+          path: app/build/outputs/apk/debug/*.apk
+          
