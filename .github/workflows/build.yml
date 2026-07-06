@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17' # La mayoría de proyectos actuales usan Java 17 o 11
+          java-version: '21' # La mayoría de proyectos actuales usan Java 17 o 11
 
       - name: Dar permisos al ejecutable de Gradle
         run: chmod +x ./gradlew
